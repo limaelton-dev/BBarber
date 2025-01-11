@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { loginSchema } from "@/lib/validations/auth";
 import { useSignIn } from "@/lib/auth/auth-hooks";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -62,10 +63,8 @@ export function LoginForm() {
         router.push("/search");
       }
     } catch (error) {
-      toast({
-        title: "Erro ao fazer login",
-        description: "Verifique suas credenciais e tente novamente",
-        variant: "destructive",
+      toast.error("Erro ao fazer login", {
+        description: "Verifique suas credenciais e tente novamente"
       });
     } finally {
       setIsLoading(false);

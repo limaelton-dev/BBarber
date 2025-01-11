@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { registerSchema } from "@/lib/validations/auth";
 import { useSignUp } from "@/lib/auth/auth-hooks";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -33,8 +34,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const formSchema = registerSchema.extend({
+const formSchema = z.object({
+  name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
+  email: z.string().email("Email inválido"),
+  password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres"),
+  confirmPassword: z.string(),
   userType: z.enum(["client", "barbershop"])
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "As senhas não coincidem",
+  path: ["confirmPassword"],
 });
 
 export function RegisterForm() {
@@ -69,10 +77,8 @@ export function RegisterForm() {
         router.push("/search");
       }
     } catch (error) {
-      toast({
-        title: "Erro ao criar conta",
-        description: "Verifique os dados e tente novamente",
-        variant: "destructive",
+      toast.error("Erro ao criar conta", {
+        description: "Verifique os dados e tente novamente"
       });
     } finally {
       setIsLoading(false);

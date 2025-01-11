@@ -1,7 +1,7 @@
 import { Providers } from "./providers";
 import "./globals.css";
 import type { Metadata } from "next";
-import { Toaster } from "@/components/ui/use-toast";
+import { Toaster } from "sonner";
 import { Inter } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -20,7 +20,7 @@ export default function RootLayout({
     <html lang="pt-BR" suppressHydrationWarning>
       <body className={inter.className} suppressHydrationWarning>
         <Providers>{children}</Providers>
-        <Toaster />
+        <Toaster richColors closeButton position="top-right" />
       </body>
     </html>
   );
