@@ -55,7 +55,7 @@ export function LoginForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setIsLoading(true);
-      await signIn(values.email, values.password, values.userType);
+      await signIn(values.email, values.password);
 
       if (values.userType === "barbershop") {
         router.push("/dashboard");

@@ -8,17 +8,17 @@ export default function BarbershopLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { profile } = useUser();
+  const { user, profile } = useUser();
   
-  const user = profile ? {
+  const userInfo = profile ? {
     name: profile.full_name,
-    email: "", // Email is stored in auth.users
-    image: profile.avatar_url,
+    email: user?.email ?? "",
+    image: profile.avatar_url || undefined,
   } : undefined;
 
   return (
     <div>
-      <ClientHeader user={user} />
+      <ClientHeader user={userInfo} />
       {children}
     </div>
   );

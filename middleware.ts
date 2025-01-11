@@ -26,12 +26,11 @@ export async function middleware(req: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession()
 
-  // Protege as rotas de dashboard
-  if (req.nextUrl.pathname.startsWith('/dashboard')) {
-    if (!session) {
-      return NextResponse.redirect(new URL('/login', req.url))
-    }
-  }
+  // if (req.nextUrl.pathname.startsWith('/dashboard')) {
+  //   if (!session) {
+  //     return NextResponse.redirect(new URL('/login', req.url))
+  //   }
+  // }
 
   return res
 }

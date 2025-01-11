@@ -7,8 +7,8 @@ export function useUser() {
 
 export function useSignIn() {
   const { signIn } = useAuth()
-  return async (email: string, password: string, type: 'client' | 'barbershop') => {
-    await signIn(email, password, type);
+  return async (email: string, password: string) => {
+    await signIn(email, password);
   };
 }
 
