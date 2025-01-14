@@ -27,26 +27,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   })
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setState(prev => ({ ...prev, user: session?.user ?? null }))
-      if (session?.user) {
-        fetchProfile(session.user.id)
+    let isInitialized = false; // Flag para evitar interferência no login inicial
+  
+    async function initializeAuth() {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error || !session) {
+        setState({ user: null, profile: null, isLoading: false });
+        return;
       }
-    })
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setState(prev => ({ ...prev, user: session?.user ?? null }))
-      if (session?.user) {
-        await fetchProfile(session.user.id)
-      }
-    })
-
-    return () => {
-      subscription.unsubscribe()
+      setState({ user: session.user, profile: null, isLoading: false });
+      fetchProfile(session.user.id);
     }
-  }, [])
+  
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (!isInitialized) return; // Evita execução durante a inicialização
+  
+        if (session) {
+          setState({ user: session.user, profile: null, isLoading: false });
+          await fetchProfile(session.user.id);
+        } else {
+          setState({ user: null, profile: null, isLoading: false });
+        }
+      }
+    );
+  
+    initializeAuth().then(() => {
+      isInitialized = true; // Permite que o listener funcione após a inicialização
+    });
+  
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+  
 
   const fetchProfile = async (userId: string) => {
     const { data, error } = await supabase
@@ -65,7 +79,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
+    if (error) {
+      console.error('Erro ao autenticar:', error);
+      throw error; // Certifique-se de que o erro está sendo lançado
+    }
   
     if (data.user) {
       setState(prev => ({ ...prev, user: data.user, isLoading: false }));
